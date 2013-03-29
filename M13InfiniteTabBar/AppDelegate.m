@@ -61,7 +61,7 @@
     M13InfiniteTabBarItem *i7 = [[M13InfiniteTabBarItem alloc] initWithTitle:@"Bird" andIcon:[UIImage imageNamed:@"tab7.png"]];
     
     //Create View Controller
-    M13InfiniteTabBarController *viewController = [[M13InfiniteTabBarController alloc] initWithViewControllers:@[c1,c2,c3,c4,c5,c6,n7] pairedWithInfiniteTabBarItems:@[i1,i2,i3,i4,i5,i6,i7]];
+    M13InfiniteTabBarController *viewController = [[M13InfiniteTabBarController alloc] initWithViewControllers:@[/*c1,c2,c3,c4,*/c5,c6,n7] pairedWithInfiniteTabBarItems:@[/*i1,i2,i3,i4,*/i5,i6,i7]];
     viewController.delegate = self;
     
     //Add alert view
@@ -70,6 +70,10 @@
     
     [viewController setCentralViewController:alert];
     [viewController showAlertForCentralViewControllerIsEmergency:YES];
+    
+    // test
+    UINavigationBar *navBar = [[UINavigationBar alloc] init];
+    [viewController.view addSubview:navBar];
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = viewController;

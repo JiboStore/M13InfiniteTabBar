@@ -25,6 +25,44 @@
     BOOL _scrollAnimationCheck;
 }
 
+- (void) tabchangedanimation:(M13InfiniteTabBarItem*)item
+{
+//    M13InfiniteTabBarItem *item = (M13InfiniteTabBarItem *)[self viewAtLocation:CGPointMake((self.frame.size.width / 2.0) + self.contentOffset.x , (self.frame.size.height/2.0) + self.contentOffset.y)];
+    
+    [UIView beginAnimations:@"TabChangedAnimation" context:nil];
+    [UIView setAnimationDuration:.5];
+    [UIView setAnimationDelegate:self];
+    
+    //Swap Nav controllers
+    if ([_tabBarDelegate respondsToSelector:@selector(infiniteTabBar:animateInViewControllerForItem:)]) {
+        [_tabBarDelegate infiniteTabBar:self animateInViewControllerForItem:item];
+    }
+    
+    //Change Tabs
+    //Set selected highlight tab on every visible tab with tag, and the one in the available array to highlight all icons while scrolling
+    [item setSelected:YES];
+    M13InfiniteTabBarItem *hiddenItem = [_items objectAtIndex:item.tag];
+    [hiddenItem setSelected:YES];
+    //Remove highlight on every other tab
+    for (M13InfiniteTabBarItem *temp in _items) {
+        if (temp.tag != item.tag) {
+            [temp setSelected:NO];
+        }
+    }
+    for (M13InfiniteTabBarItem *temp in _visibleIcons) {
+        if (temp.tag != item.tag) {
+            [temp setSelected:NO];
+        }
+    }
+    
+    _previousSelectedIndex = item.tag;
+    _selectedItem = item;
+    
+    [UIView setAnimationDidStopSelector:@selector(didSelectItem)];
+    
+    [UIView commitAnimations];
+}
+
 - (id)initWithInfiniteTabBarItems:(NSArray *)items
 {
     self = [super initWithFrame:CGRectMake(0, 0, [[UIScreen mainScreen] applicationFrame].size.width, 60)];
@@ -39,6 +77,7 @@
         _tabContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 10, self.contentSize.width, self.contentSize.height)];
         _tabContainerView.backgroundColor = [UIColor clearColor];
         _tabContainerView.userInteractionEnabled = NO;
+        self.scrollEnabled = NO;
         [self addSubview:_tabContainerView];
         
         //hide horizontal indicator so the recentering trick is not revealed
@@ -111,7 +150,7 @@
 {
     [super layoutSubviews];
     
-    [self recenterIfNecessary];
+//    [self recenterIfNecessary];
     
     // tile content in visible bounds
     CGRect visibleBounds = [self convertRect:[self bounds] toView:_tabContainerView];
@@ -243,7 +282,8 @@
         [self scrollViewDidEndScrollingAnimation:self];
     } else {
         //Center tapped tab
-        [self setContentOffset:CGPointMake((item.frame.origin.x + (item.frame.size.width / 2.0)) - (self.frame.size.width / 2.0), 0) animated:YES];
+//        [self setContentOffset:CGPointMake((item.frame.origin.x + (item.frame.size.width / 2.0)) - (self.frame.size.width / 2.0), 0) animated:YES];
+        [self tabchangedanimation:item];
     }
 }
 
@@ -254,7 +294,8 @@
         [self scrollViewDidEndScrollingAnimation:self];
     } else {
         //Center tapped tab
-        [self setContentOffset:CGPointMake((selectedItem.frame.origin.x + (selectedItem.frame.size.width / 2.0)) - (self.frame.size.width / 2.0), 0) animated:YES];
+//        [self setContentOffset:CGPointMake((selectedItem.frame.origin.x + (selectedItem.frame.size.width / 2.0)) - (self.frame.size.width / 2.0), 0) animated:YES];
+        [self tabchangedanimation:selectedItem];
     }
 }
 
